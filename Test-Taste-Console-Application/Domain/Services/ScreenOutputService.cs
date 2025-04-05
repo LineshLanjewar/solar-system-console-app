@@ -20,10 +20,10 @@ namespace Test_Taste_Console_Application.Domain.Services
             _moonService = moonService;
         }
 
-        public void OutputAllPlanetsAndTheirMoonsToConsole()
+        public void OutputAllPlanetsAndTheirMoonsToConsole(Planet[] planets)
         {
             //The service gets all the planets from the API.
-            var planets = _planetService.GetAllPlanets().ToArray();
+            //var planets = _planetService.GetAllPlanets().ToArray();
 
             //If the planets aren't found, then the function stops and tells that to the user via the console.
             if (!planets.Any())
@@ -42,10 +42,10 @@ namespace Test_Taste_Console_Application.Domain.Services
 
             //The column sizes and labels for the moons are configured here.
             //The second moon's column needs the 2 extra '-' characters so that it's aligned with the planet's column.
-            var columnSizesForMoons = new[] { 20, 70 + 2 };
+            var columnSizesForMoons = new[] { 20, 20, 30};
             var columnLabelsForMoons = new[]
             {
-                OutputString.MoonNumber, OutputString.MoonId
+                OutputString.MoonNumber, OutputString.MoonId, OutputString.MoonAvgTemperature
             };
 
             //The for loop creates the correct output.
@@ -77,7 +77,7 @@ namespace Test_Taste_Console_Application.Domain.Services
                     ConsoleWriter.CreateText(
                         new[]
                         {
-                            l.ToString(), CultureInfoUtility.TextInfo.ToTitleCase(planets[i].Moons.ElementAt(k).Id)
+                            l.ToString(), CultureInfoUtility.TextInfo.ToTitleCase(planets[i].Moons.ElementAt(k).Id), planets[i].Moons.ElementAt(k).AvgTemperature.ToString()
                         },
                         columnSizesForMoons);
                 }
@@ -143,10 +143,10 @@ namespace Test_Taste_Console_Application.Domain.Services
              */
         }
 
-        public void OutputAllPlanetsAndTheirAverageMoonGravityToConsole()
+        public void OutputAllPlanetsAndTheirAverageMoonGravityToConsole(Planet[] planets)
         {
             //The function works the same way as the PrintAllPlanetsAndTheirMoonsToConsole function. You can find more comments there.
-            var planets = _planetService.GetAllPlanets().ToArray();
+            // var a = _planetService.GetAllPlanets().ToArray();
             if (!planets.Any())
             {
                 Console.WriteLine(OutputString.NoMoonsFound);
@@ -184,6 +184,32 @@ namespace Test_Taste_Console_Application.Domain.Services
                 1                   |0.0f
                 --------------------+--------------------------------------------------
             */
+        }
+
+        public void OutputAllPlanetsAndTheirMoonsAvgTemperature(Planet[] planets)
+        {
+            if (!planets.Any())
+            {
+                Console.WriteLine(OutputString.NoPlanetsFound);
+                return;
+            }
+            var columnSizes = new[] { 20, 20, 20, 40 };
+            var columnLabels = new[]
+            {
+                    OutputString.PlanetNumber, OutputString.PlanetId, OutputString.TotalMoons, OutputString.PlanetMoonAverageTemperature
+            };
+            ConsoleWriter.CreateHeader(columnLabels, columnSizes);
+
+            //The for loop creates the correct output.
+            for (int i = 0, j = 1; i < planets.Length; i++, j++)
+            {
+                var planet = planets[i];
+
+                if (planet.HasMoons())
+                {
+                    ConsoleWriter.CreateText(new string[] { j.ToString(), $"{planet.Id}", $"{planet.Moons.Count}", $"{planet.Moons.Average(moon => moon.AvgTemperature)}" }, columnSizes);
+                }
+            }
         }
     }
 }
